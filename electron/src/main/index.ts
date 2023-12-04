@@ -1,7 +1,20 @@
-import { app, shell, BrowserWindow } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, session } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import os from 'node:os'
+import path from 'node:path'
+
+import voltadb from '../volta/database/sequelize'
+const dbPath = path.join(__dirname, '..', '..', '..', 'tmp', 'volta.db')
+
+import "./ipc/horloge.ts"
+
+// on macOS
+const reactDevToolsPath = path.join(
+  os.homedir(),
+  '/Library/Application Support/Google/Chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/4.28.5_0'
+)
 
 function createWindow(): void {
   // Create the browser window.
@@ -38,9 +51,17 @@ function createWindow(): void {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
+
+  if (reactDevToolsPath) {
+    //await session.defaultSession.loadExtension(reactDevToolsPath)
+  }
+
+  if (voltadb && !voltadb.isSYNC) {
+    await voltadb.initdb(dbPath)
+  }
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.

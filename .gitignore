@@ -1,4 +1,16 @@
-node_modules
-dist
-out
-*.log*
+# Node.js
+node_modules/
+
+# TypeScript
+*.tsbuildinfo
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+/tmp/*
+
+package-lock.json
+yarn.lock
