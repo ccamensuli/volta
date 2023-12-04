@@ -1,16 +1,23 @@
 {
   "name": "volta-infra",
   "version": "1.0.0",
+  "type": "module",
   "description": "infra devops",
-  "main": "bin/index.js",
+  "main": "src/index.js",
   "author": "",
   "license": "MIT",
   "scripts": {
+    "volta": "bin/volta",
     "build": "yarn --cwd ./electron install",
     "start": "node bin/index.js",
-    "dev": "yarn --cwd ./electron dev"
+    "dev": "yarn --cwd ./electron dev",
+    "changelog": "conventional-changelog -p conventionalcommits -i CHANGELOG.md -s -r 0"
   },
   "dependencies": {
-    "concurrently": "8.2.2"
+    "concurrently": "8.2.2",
+    "inquirer": "9.2.12"
+  },
+  "devDependencies": {
+    "conventional-changelog-cli": "4.1.0"
   }
 }
