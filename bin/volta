@@ -1,0 +1,198 @@
+#!/usr/bin/env node
+import inquirer from 'inquirer'
+import asciify from 'asciify'
+import path from 'node:path'
+import {spawn}  from "child_process"
+import { createRequire } from "module"
+const require = createRequire(import.meta.url)
+const modulePackage = require("../package.json")
+
+asciify(modulePackage.name, {color: 'green', font:'banner'},  (err, result) => {
+  console.clear()
+	console.log(`${result}
+  version ${modulePackage.version}
+  `)
+  inquirer
+    .prompt([{
+      type: 'list',
+      name: 'response',
+      message: 'Volta infra',
+      choices: [ 'build', 'dev', 'prod', 'docker', 'vagrant',"deploy"],
+      filter: function(val) {
+        return val.toLowerCase();
+      }
+    }])
+    .then((answers) => {
+      switch(answers.response){
+        case "dev" :
+          dev()
+        break
+        case "build" :
+          build()
+        break
+        default:
+          console.error(`not implemeted`)
+      }
+    })
+    .catch((error) => {
+    throw error
+    });
+});
+
+async function install () {
+  return yarn(['install'])
+}
+
+async function build () {
+  return yarn(['build'])
+}
+
+async function dev () {
+  return yarn(['dev'])
+}
+
+
+function runPackageManager (argv = [], cwd = path.resolve("."), env, manager) {
+  const currentenv = process.env.NODE_ENV;
+  switch (env) {
+  case "dev":
+  case "development":
+    switch (manager) {
+    case "npm":
+    case "yarn":
+    case "pnpm":
+      break;
+    }
+    process.env.NODE_ENV = "development";
+    break;
+  case "prod":
+  case "production":
+    switch (manager) {
+    case "npm":
+      argv.push("--omit=dev");
+      break;
+    case "yarn":
+      argv.push("--production");
+      break;
+    case "pnpm":
+      argv.push("--prod");
+      break;
+    }
+    process.env.NODE_ENV = "production";
+    break;
+  default:
+    process.env.NODE_ENV = "production";
+  }
+  return new Promise((resolve, reject) => {
+    let cmd = null;
+    try {
+    
+      console.log(`Command : ${manager} ${argv.join(" ")} in cwd : ${cwd}`);
+      const exe = getCommandManager(manager);
+      cmd = myspawn(exe, argv, {
+        cwd,
+        env: process.env,
+        stdio: "inherit",
+        NODE_ENV: process.env.NODE_ENV
+      }, (code) => {
+        process.env.NODE_ENV = currentenv;
+        if (code === 0) {
+          return resolve(code);
+        }
+        return resolve(new Error(`Command : ${manager} ${argv.join(" ")}  cwd : ${cwd} Error Code : ${code}`));
+      });
+    } catch (e) {
+      process.env.NODE_ENV = currentenv;
+      console.error(e, "ERROR");
+      return reject(e);
+    }
+  });
+}
+
+  function getCommandManager (manager) {
+  if (process.platform === "win32") {
+    switch (manager) {
+    case "npm":
+      return "npm.cmd";
+    case "yarn":
+      return "yarn.cmd";
+    case "pnpm":
+      return "pnpm.cmd";
+    default:
+      throw new Error(`bad manager : ${manager}`);
+    }
+  } else {
+    switch (manager) {
+    case "npm":
+      return "npm";
+    case "yarn":
+      return "yarn";
+    case "pnpm":
+      return "pnpm";
+    default:
+      throw new Error(`bad manager : ${manager}`);
+    }
+  }
+}
+
+async function npm (argv = [], cwd = path.resolve("."), env = "dev") {
+  return runPackageManager(argv, cwd, env, "npm");
+}
+
+async function yarn (argv = [], cwd = path.resolve("."), env = "dev") {
+  return runPackageManager(argv, cwd, env, "yarn");
+}
+
+async function pnpm (argv = [], cwd = path.resolve("."), env = "dev") {
+  return runPackageManager(argv, cwd, env, "pnpm");
+}
+
+
+function myspawn (command, args, options = {}, close = null) {
+  return new Promise((resolve, reject) => {
+    let cmd = null;
+    try {
+      if (options.NODE_ENV) {
+        options.env.NODE_ENV = options.NODE_ENV;
+        delete options.NODE_ENV;
+      }
+      cmd = spawn(command, args, options || {});
+      if (cmd.stdout) {
+        cmd.stdout.on("data", (data) => {
+          const str = data.toString();
+          if (str) {
+            process.stdout.write(str);
+          }
+        });
+      }
+      if (cmd.stderr) {
+        cmd.stderr.on("data", (data) => {
+          const str = data.toString();
+          if (str) {
+            process.stdout.write(str);
+          }
+        });
+      }
+      cmd.on("close", (code) => {
+        if (close) {
+          close(code);
+        }
+        if (code !== 0) {
+          console.error(`Spawn : ${command} ${args.join(" ")} Error Code : ${code}`);
+        }
+        return resolve(code);
+      });
+      cmd.on("error", (err) => {
+        console.log(err);
+        return reject(err);
+      });
+      if (cmd.stdin) {
+        process.stdin.pipe(cmd.stdin);
+      }
+    } catch (e) {
+      console.error(e);
+      return reject(e);
+    }
+  });
+}
+
