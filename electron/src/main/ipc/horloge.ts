@@ -83,6 +83,24 @@ class Horloge implements voltaIPC {
           })
         }
         break
+      case 'UPDATE':
+        try {
+          return this.sendMessage(event, {
+            channel: message.channel,
+            action: message.action,
+            id: message.id || null,
+            date: new Date().getTime(),
+            datas: await this.updateAlarm(message.datas)
+          })
+        } catch (e) {
+          return this.sendMessage(event, {
+            channel: message.channel,
+            action: message.action,
+            id: message.id || null,
+            date: new Date().getTime(),
+            error: e
+          })
+        }
       default:
         throw new Error(`Bad protocol`)
     }
@@ -92,39 +110,77 @@ class Horloge implements voltaIPC {
     return event.reply(this.channel, JSON.stringify(message))
   }
 
-  async getAlarm(): Promise<JSON[]> {
-    return  new Promise((resolve, reject)=>{
+  async getAlarm(datas: unknown): Promise<JSON[]> {
+    return new Promise((resolve, reject) => {
       // call database
       if (voltadb && voltadb.alarm) {
-        return setTimeout(() => {
-          resolve( voltadb.alarm.findAll() )
-        }, 3000);
-
+        //return setTimeout(() => {
+        resolve(voltadb.alarm.findAll())
+        //}, 3000)
       }
       return reject(new Error('Api not found'))
     })
   }
 
-  async setAlarm(datas: unknown): Promise<JSON[]| Error> {
+  async setAlarm(datas: unknown): Promise<JSON[]> {
     if (voltadb && voltadb.alarm) {
       const message = JSON.parse(datas)
       voltadb.alarm
         .create(message)
-        .then(() => {
-          return this.getAlarm()
+        .then((res) => {
+          return res
         })
-        .catch((e) => {
+        .catch((e: Error) => {
           console.error(e)
           throw e
         })
     }
-    return new Error('Api not found')
+    return Promise.reject(new Error('Api not found'))
   }
 
-  async deleteAlarm(datas: unknown): Promise<JSON[]> {
-    console.info(datas)
-    return []
+  async deleteAlarm(datas: unknown): Promise<void> {
+    if (voltadb && voltadb.alarm) {
+      const options = {
+        where: {
+          id: datas.id
+        }
+      }
+      return voltadb.alarm
+        .destroy(options)
+        .then((res) => {
+          return res
+        })
+        .catch((e: Error) => {
+          console.error(e)
+          throw e
+        })
+    }
+    return Promise.reject(new Error('Api not found'))
+  }
+
+  async updateAlarm(datas: unknown): Promise<JSON[]> {
+    if (voltadb && voltadb.alarm) {
+      const options = {
+        where: {
+          id: datas.id
+        }
+      }
+      const alarm = await voltadb.alarm.findOne(options)
+      if (alarm) {
+        alarm.activate = datas.activate
+        return alarm
+          .save({ fields: ['activate'] })
+          .then((res) => {
+            return res
+          })
+          .catch((e: Error) => {
+            console.error(e)
+            throw e
+          })
+      }
+      return Promise.reject(new Error('Alarm not found'))
+    }
+    return Promise.reject(new Error('Api not found'))
   }
 }
-
 export default new Horloge()
