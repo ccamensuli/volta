@@ -19,21 +19,8 @@ class Alarm extends Model<InferAttributes<Alarm>, InferCreationAttributes<Alarm>
   declare date: string
   declare active: boolean
   declare message: string
-
-  async getAlarms(): Promise<JSON[] | null> {
-    try {
-      const alarms = await Alarm.findAll()
-      return alarms.map((alarm) => alarm.toJSON()) as AlarmAttributes[]
-    } catch (error) {
-      console.error('Error fetching alarms:', error)
-      return null
-    }
-  }
-
-  getFullname(): string[] {
-    return [this.date, this.message]
-  }
 }
+
 
 const options: ModelOptions = {
   tableName: 'alarms'

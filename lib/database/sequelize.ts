@@ -1,9 +1,9 @@
 import { Sequelize, Model, ModelAttributes } from 'sequelize'
+//import Model from 'sequelize/types/model'
 import path from 'node:path'
+import clc from 'cli-color'
 
 import Alarm from './models/Alarm'
-import { SequelizeMethod } from 'sequelize/types/utils'
-
 
 let singleton: VoltaDb | null = null
 
@@ -18,7 +18,9 @@ class VoltaDb {
     this.sequelize = new Sequelize({
       dialect: 'sqlite',
       storage: pathDb, // Spécifiez le chemin où vous voulez stocker la base de données SQLite
-      logging: true
+      logging: (...arg) => {
+        console.debug(clc.blue(...arg))
+      }
     })
     this.alarm = this.addModel(Alarm)
     await this.sync()
@@ -55,7 +57,8 @@ class VoltaDb {
     const ele = [
       {
         date: new Date(),
-        message: 'tetetete'
+        message: 'tetetete',
+        active: false
       }
     ]
     return this.alarm
