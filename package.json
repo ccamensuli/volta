@@ -10,9 +10,9 @@
     "volta": "bin/volta"
   },
   "scripts": {
-    "volta": "bin/volta",
+    "volta": "npx volta",
     "build": "yarn --cwd ./electron install",
-    "start": "node bin/index.js",
+    "start": "npx volta",
     "dev": "yarn --cwd ./electron dev",
     "changelog": "conventional-changelog -p conventionalcommits -i CHANGELOG.md -s -r 0"
   },

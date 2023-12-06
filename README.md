@@ -8,59 +8,73 @@ Programmer une horloge avec gestion d'alarme.
 - Mettez en place la mécanique de communication d'Electron pour permettre la communication entre les processus.
 
 
-# GET STARTED
+# GET STARTED 
 
+## yarn est obligatoire 
 ```bash
 $ npm -g install yarn
 $ yarn install
 $ yarn build
-$ yarn dev
-```
-!! si on utilse npm il faudra corriger le package.json  
-``` json
- "scripts": {
-    "build": "yarn --cwd ./electron install",
-    "start": "node bin/index.js",
-    "dev": "yarn --cwd ./electron dev"
-  },
-```
-``` json
- "scripts": {
-    "build": "npm install --prefix ./electron",
-    "start": "node bin/index.js",
-    "dev": "npm run dev --prefix ./electron"
-  },
+$ yarn dev 
 ```
 
-# Environment de developpment: (/) (ceci est un exemple je ne realise pas toutes ces parties)
+# Environment de developpment:
 
+  ## ceci est un exemple je ne realise pas toutes ces parties
   Pour le travail en equipe et la vie du projet  il est important de definir un infrastructure durable et maintenable
   J'ai décidé de mettre en place un répertoire en amont dans l'environnement avec des outils de développement et de devops.
 
-  Voici les étapes  :
+  ## Voici les étapes  :
 
 - Mise en place de la virtualisation (Docker, Virtualbox, etc.) pour gérer les dépendances du projet et assurer l'autonomie sur les postes de développement.
 - Mise en place d'une CI/CD (Continuous Integration/Continuous Deployment) ; par exemple, l'utilisation de GitLab, de webhooks, etc.
-- Intégration d'une interface en ligne de commande (CLI) DevOps (un exécutable Volta pour une installation rapide sur le poste de développement avec par exemple  `$ volta build`).
+- Intégration d'une interface en ligne de commande (CLI) DevOps (un exécutable Volta pour une installation rapide sur le poste de développement avec par exemple  `$ npx volta build`).
 - Mise en place par exemple d'Ansible pour prévoir des déploiements de tests et de production sur la machine finale.
 - Intégration d'une bibliothèque Volta indépendante pour la séparation des préoccupations métier. Le choix d'Electron n'est pas figé, donc il est intéressant de créer une bibliothèque qui ne dépend pas d'Electron et de son 'IPC' pour réaliser des tâches métier, comme par exemple la gestion de la base de données dans le cas de l'exercice.
 - Mise en place d'un environnement de tests unitaires, de documentation et de formatage de code versionné (norme ISO).
 - Utilisation de sous-modules Git pour les dépendances de travail inter-équipes.
 - Mise en place d'un systeme de log
 
-TRUNK (/)
+## REPOSITORY (/)
 ```
 volta
+├── CHANGELOG.md
+├── README.md
 ├── Vagrantfile
 ├── ansible
 ├── bin
 ├── docker
 ├── electron
 ├── lib
+├── logs
+├── node_modules
 ├── package.json
 ├── shared
+├── src
 ├── tmp
-└── tools
+├── tools
+└── yarn.lock
+```
+
+## CLI (/bin/volta) npx volta ou yarn start 
+``` bash
+ #    #   ####   #       #####    ##   
+ #    #  #    #  #         #     #  #  
+ #    #  #    #  #         #    #    # 
+ #    #  #    #  #         #    ###### 
+  #  #   #    #  #         #    #    # 
+   ##     ####   ######    #    #    # 
+                                       
+  version 1.0.0
+  
+? Volta infra (Use arrow keys)
+❯ build 
+  dev 
+  prod 
+  docker 
+  vagrant 
+  deploy 
+  quit 
 ```
 
 ## Choix du Bac à Sable Electron (/electron)
@@ -72,7 +86,7 @@ Après avoir installé les deux, je décide d'utiliser Electron Vite, mais mon c
 Je pourrais en dire plus après avoir eu davantage d'expérience dans le développement,
 notamment en ce qui concerne les fonctionnalités telles que le Hot Module Replacement (HMR) et autres.
 
-ELECTRON (/electron)
+### ELECTRON (/electron)
 ```
 ├── README.md
 ├── build
@@ -129,8 +143,8 @@ Il faudra trouver une solution avec mécanisme IPC (Inter-Process Communication)
 ## Librairies Utilisées
 
 ###  BACKEND 
-  - la database sera gerée avec un ORM Sequelize (sqlite3) (multibases)
-  - [JSON RPC](https://www.jsonrpc.org/specification) pour le protocole entre le process main (node) et renderer 
+  - La database sera gerée avec un ORM [Sequelize](https://sequelize.org/) (avec sqlite3) (multibases)
+  - [JSON RPC](https://www.jsonrpc.org/specification) pour le protocole entre le process main et renderer 
     pour l'exercice je decrirais un protole maison  exemple : 
 ``` typescript
 interface msgTemplate {
@@ -144,18 +158,21 @@ interface msgTemplate {
 ```
 
 ### FRONTEND
+    -Pour les Notifications d'alarme j'utilise  [Notification API](https://developer.mozilla.org/en-US/docs/Web/API/Notifications_API/Using_the_Notifications_API) attention de pas les bloquer sur os
    - Pour les dates [Moment.js](https://momentjs.com/)
    - Pour découvrir les hooks react j'utiliserais [usehooks-ts](https://usehooks-ts.com/)
    - Pour l'UI intégration de [MUI](https://mui.com/)
 
 # Améliorations possibles 
-  - Mettre un Place un systeme de log puissant qui peux s'interfacer avec les outils actuel
-  - Revoir les types de ORM sequelize et autres (manque d'experience )
-  - Revoir le cycle de vie react pour un bon montage des composants etc ...  (manque d'experience )
+  - Utilser un protocle serieux pour la communication interprocess (le typage seras plus facile)
+  - Revoir les types de ORM sequelize et autres  (manque d'experience)
+  - Refactoriser un hook react pour un retour async des messages IPC (avec un id)
+  - Revoir le cycle de vie react pour un bon montage des composants , bonnes pratiques etc ...  ( manque d'experience )
   - Refactorise l'alarme sur le backend  et utilser une crontab ou un logiciel de workflow de taches
   - Faire sonner l'alarme avec la webaudio api (voir la compatibilé electron ?)
   - Gestion des locales et des timezones
   - mettre en place de la documentation pour la lib et du jsdoc 
+  - Mettre un Place un systeme de log puissant qui peux s'interfacer avec les outils actuel
 
 # Production Electron (je ne realise pas cette partie)
 
