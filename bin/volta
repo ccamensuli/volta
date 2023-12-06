@@ -17,7 +17,7 @@ asciify(modulePackage.name, {color: 'green', font:'banner'},  (err, result) => {
       type: 'list',
       name: 'response',
       message: 'Volta infra',
-      choices: [ 'build', 'dev', 'prod', 'docker', 'vagrant',"deploy"],
+      choices: [ 'build', 'dev', 'prod', 'docker', 'vagrant',"deploy","quit"],
       filter: function(val) {
         return val.toLowerCase();
       }
@@ -30,6 +30,9 @@ asciify(modulePackage.name, {color: 'green', font:'banner'},  (err, result) => {
         case "build" :
           build()
         break
+        case "quit" :
+          quit()
+        break
         default:
           console.error(`not implemeted`)
       }
@@ -38,6 +41,10 @@ asciify(modulePackage.name, {color: 'green', font:'banner'},  (err, result) => {
     throw error
     });
 });
+
+async function quit () {
+  return process.exit(0)
+}
 
 async function install () {
   return yarn(['install'])
