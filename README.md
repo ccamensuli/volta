@@ -11,11 +11,12 @@ Programmer une horloge avec gestion d'alarme.
 # GET STARTED
 
 ```bash
+$ npm -g install yarn
 $ yarn install
 $ yarn build
 $ yarn dev
 ```
-!! si on utilse npm il faudra corriger le package.json
+!! si on utilse npm il faudra corriger le package.json  
 ``` json
  "scripts": {
     "build": "yarn --cwd ./electron install",
@@ -38,13 +39,14 @@ $ yarn dev
 
   Voici les étapes  :
 
--  Mise en place de la virtualisation (Docker, Virtualbox, etc.) pour gérer les dépendances du projet et assurer l'autonomie sur les postes de développement.
+- Mise en place de la virtualisation (Docker, Virtualbox, etc.) pour gérer les dépendances du projet et assurer l'autonomie sur les postes de développement.
 - Mise en place d'une CI/CD (Continuous Integration/Continuous Deployment) ; par exemple, l'utilisation de GitLab, de webhooks, etc.
 - Intégration d'une interface en ligne de commande (CLI) DevOps (un exécutable Volta pour une installation rapide sur le poste de développement avec par exemple  `$ volta build`).
 - Mise en place par exemple d'Ansible pour prévoir des déploiements de tests et de production sur la machine finale.
 - Intégration d'une bibliothèque Volta indépendante pour la séparation des préoccupations métier. Le choix d'Electron n'est pas figé, donc il est intéressant de créer une bibliothèque qui ne dépend pas d'Electron et de son 'IPC' pour réaliser des tâches métier, comme par exemple la gestion de la base de données dans le cas de l'exercice.
 - Mise en place d'un environnement de tests unitaires, de documentation et de formatage de code versionné (norme ISO).
 - Utilisation de sous-modules Git pour les dépendances de travail inter-équipes.
+- Mise en place d'un systeme de log
 
 TRUNK (/)
 ```
@@ -144,12 +146,16 @@ interface msgTemplate {
 ### FRONTEND
    - Pour les dates [Moment.js](https://momentjs.com/)
    - Pour découvrir les hooks react j'utiliserais [usehooks-ts](https://usehooks-ts.com/)
-   - Pour UI intégration de [MUI](https://mui.com/)
+   - Pour l'UI intégration de [MUI](https://mui.com/)
 
 # Améliorations possibles 
+  - Mettre un Place un systeme de log puissant qui peux s'interfacer avec les outils actuel
+  - Revoir les types de ORM sequelize et autres (manque d'experience )
+  - Revoir le cycle de vie react pour un bon montage des composants etc ...  (manque d'experience )
+  - Refactorise l'alarme sur le backend  et utilser une crontab ou un logiciel de workflow de taches
   - Faire sonner l'alarme avec la webaudio api (voir la compatibilé electron ?)
-  - Refactorise l'alarme sur le backend  et utilser une crontab pour realiser un workflow de taches
   - Gestion des locales et des timezones
+  - mettre en place de la documentation pour la lib et du jsdoc 
 
 # Production Electron (je ne realise pas cette partie)
 
