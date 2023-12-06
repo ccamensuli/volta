@@ -21,7 +21,6 @@ class Alarm extends Model<InferAttributes<Alarm>, InferCreationAttributes<Alarm>
   declare message: string
 }
 
-
 const options: ModelOptions = {
   tableName: 'alarms'
 }
@@ -47,11 +46,11 @@ const definitions = {
   }
 }
 
-const obj: definition = {
+const model: definition = {
   name: 'Alarm',
   model: Alarm,
   definitions,
   options
 }
 
-export default obj
+export default model

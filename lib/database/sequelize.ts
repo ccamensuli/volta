@@ -1,8 +1,5 @@
-import { Sequelize, Model, ModelAttributes } from 'sequelize'
-//import Model from 'sequelize/types/model'
-import path from 'node:path'
+import { Sequelize, Model } from 'sequelize'
 import clc from 'cli-color'
-
 import Alarm from './models/Alarm'
 
 let singleton: VoltaDb | null = null
@@ -24,7 +21,6 @@ class VoltaDb {
     })
     this.alarm = this.addModel(Alarm)
     await this.sync()
-    await this.addSeeders()
     return this.sequelize
   }
   async sync(): Promise<Sequelize | null> {
@@ -48,35 +44,11 @@ class VoltaDb {
     try {
       return model.init(definitions, { ...options, sequelize: this.sequelize })
     } catch (e: unknown) {
-      console.log(e)
+      console.error(e)
       throw e
     }
   }
 
-  async addSeeders(): Promise<JSON[]> {
-    const ele = [
-      {
-        date: new Date(),
-        message: 'tetetete',
-        active: false
-      }
-    ]
-    return this.alarm
-      .create(ele[0])
-      .then((ele) => {
-        //console.log(ele)
-        return this.alarm.findAll()
-      })
-      .then((ele) => {
-        //console.log(ele)
-        return ele
-      })
-      .catch((e) => {
-        console.log(e)
-        throw e
-      })
-    return []
-  }
 }
 if (!singleton) {
   singleton = new VoltaDb()
