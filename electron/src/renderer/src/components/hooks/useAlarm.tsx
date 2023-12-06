@@ -1,5 +1,5 @@
 import moment from 'moment'
-import { useState, useRef, useEffect } from 'react'
+import { useState } from 'react'
 import { useInterval } from 'usehooks-ts'
 
 interface AlarmOutput {
@@ -8,19 +8,20 @@ interface AlarmOutput {
 
 function useAlarm(
   alarms: [],
-  onTick: (date: Date) => void,
+  onTick: (date: Date, activeAlarm: unknown[]) => void,
   onRing: (alarm: unknown) => void
 ): AlarmOutput {
   const [tick] = useState<number>(1000)
   const [check] = useState<number>(1000)
   const [currentTime, setCurrentTime] = useState<Date>(new Date())
+  const [activeAlarm, setActiveAlarm] = useState<unknown[]>([])
 
   useInterval(() => {
     const current = new Date()
     setCurrentTime(current)
     if (onTick) {
       //console.log(alarms)
-      onTick(current)
+      onTick(current, activeAlarm)
     }
   }, tick)
 
@@ -38,23 +39,31 @@ function useAlarm(
     return notif
   }
 
-  const handleCheck = (): any => {
+  const handleCheck = (): void => {
     if (alarms.length) {
       const now = moment(currentTime).format('HH:mm')
       alarms.filter((ele) => {
         const alarm = moment(ele.date).format('HH:mm')
+        const newActive = activeAlarm.filter((oldactive: any) => {
+          const test = moment(oldactive.date).format('HH:mm')
+          if (test === now) {
+            return oldactive
+          }
+        })
         if (alarm === now && ele.active && !(ele.isNotif === true)) {
           if (onRing) {
             try {
-              onRing(ele)
               notification(`Alarm ${alarm}`, ele.message)
+              newActive.push(ele)
               ele.isNotif = true
+              onRing(ele)
             } catch (e) {
               console.error(e)
               throw e
             }
           }
         }
+        setActiveAlarm(newActive)
       })
     }
   }

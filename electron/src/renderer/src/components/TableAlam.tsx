@@ -16,18 +16,32 @@ export default function TableAlarm(props: {
   loading: boolean
   onLoading: (loading: boolean) => void
   onAlarms: (datas: IpcMessage['datas'] | []) => void
-  reload: boolean
+  reload?: boolean
 }): JSX.Element {
   const ipcChannel = 'ipc-volta-horloge'
-  const { once, sendMessage, loading, datas } = useIpc(ipcChannel)
+  const { on, sendMessage, loading, datas } = useIpc(ipcChannel)
 
   useEffect(() => {
-    const unlisten = once((messageipc: IpcMessage) => {
-      props.onAlarms(messageipc.datas)
+    const unlisten = on((messageipc: IpcMessage) => {
+      switch (messageipc.action) {
+        case 'GET':
+          props.onAlarms(messageipc.datas)
+          break
+        case 'CREATE':
+          getAlarm()
+          break
+        case 'DELETE':
+          getAlarm()
+          break
+        case 'UPDATE':
+          getAlarm()
+          break
+        default:
+          break
+      }
     })
     getAlarm()
     return () => {
-      console.log('passss')
       unlisten()
     }
   }, [])
@@ -44,10 +58,10 @@ export default function TableAlarm(props: {
 
   // Mutations
   const handleChange = (id: number, active: boolean): void => {
-    console.log('switch', id, active)
+    activateAlarm(id, active)
   }
   const handeldelete = (id: number): void => {
-    console.log('delete', id)
+    deleteAlarm(id)
   }
 
   const getAlarm = (): void => {
@@ -60,15 +74,15 @@ export default function TableAlarm(props: {
     }
     sendMessage(message)
   }
-  const activateAlarm = (id: number): void => {
+  const activateAlarm = (id: number, activate: boolean): void => {
     const message: IpcMessage = {
       channel: 'ipc-volta-horloge',
       date: new Date().getTime(),
-      action: 'GET',
-      datas: { id },
+      action: 'UPDATE',
+      datas: { id, activate },
       error: null
     }
-    return sendMessage(message)
+    sendMessage(message)
   }
   const deleteAlarm = (id: number): void => {
     const message: IpcMessage = {
@@ -78,7 +92,7 @@ export default function TableAlarm(props: {
       datas: { id },
       error: null
     }
-    return sendMessage(message)
+    sendMessage(message)
   }
   // RENDER
   return (
@@ -95,29 +109,32 @@ export default function TableAlarm(props: {
               </TableRow>
             </TableHead>
             <TableBody>
-              {datas.datas.map((row) => (
-                <TableRow key={row.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
-                  <TableCell component="th" scope="row" style={{ fontSize: '50px' }}>
-                    {moment(row.date).format('HH:mm')}
-                  </TableCell>
-                  <TableCell align="right">{row.message}</TableCell>
-                  <TableCell align="center">
-                    <Switch
-                      checked={row.active}
-                      onChange={() => {
-                        handleChange(row.id, row.active)
-                      }}
-                    />
-                  </TableCell>
-                  <TableCell align="center">
-                    <DeleteIcon
-                      onClick={() => {
-                        handeldelete(row.id)
-                      }}
-                    />
-                  </TableCell>
-                </TableRow>
-              ))}
+              {datas &&
+                datas.datas &&
+                datas.datas.map &&
+                datas.datas.reverse().map((row) => (
+                  <TableRow key={row.id}>
+                    <TableCell component="th" scope="row" style={{ fontSize: '50px' }}>
+                      {moment(row.date).format('HH:mm')}
+                    </TableCell>
+                    <TableCell align="right">{row.message}</TableCell>
+                    <TableCell align="center">
+                      <Switch
+                        checked={row.active}
+                        onChange={() => {
+                          handleChange(row.id, row.active)
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell align="center">
+                      <DeleteIcon
+                        onClick={() => {
+                          handeldelete(row.id)
+                        }}
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))}
             </TableBody>
           </Table>
         </TableContainer>

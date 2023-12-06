@@ -2,7 +2,6 @@ import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 export type Channels = 'ipc-volta'
 
-
 // Custom APIs for renderer
 const api = {
   sendMessage(channel: Channels, ...args: unknown[]): void {
@@ -22,7 +21,6 @@ const api = {
     ipcRenderer.once(channel, (_event, ...args) => func(...args))
     return () => {}
   }
-
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

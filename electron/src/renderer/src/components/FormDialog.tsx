@@ -9,14 +9,11 @@ import DialogContentText from '@mui/material/DialogContentText'
 import DialogTitle from '@mui/material/DialogTitle'
 import useIpc from './hooks/useIpc'
 import moment from 'moment'
-
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
-import { TimePicker } from '@mui/x-date-pickers/TimePicker'
 import { StaticTimePicker } from '@mui/x-date-pickers/StaticTimePicker'
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
 import CircularProgress from '@mui/material/CircularProgress/CircularProgress'
 import Switch from '@mui/material/Switch/Switch'
-import InputLabel from '@mui/material/InputLabel/InputLabel'
 
 interface AlarmFormData {
   message: string
@@ -126,13 +123,6 @@ export default function FormDialog(props: {
             />
 
             <LocalizationProvider dateAdapter={AdapterMoment}>
-              {/* <TimePicker
-                label="Date"
-                value={date}
-                onChange={(newValue) => setDate(newValue)}
-                ampm={false}
-                timeSteps={{ hours: 1, minutes: 1 }}
-              /> */}
               <StaticTimePicker
                 sx={{ margin: '10px' }}
                 value={date}
@@ -147,11 +137,10 @@ export default function FormDialog(props: {
               ></StaticTimePicker>
             </LocalizationProvider>
             <Switch
-              label="Activer l'alarme"
               name="activate"
               checked={activate}
               onChange={handleChange}
-              inputProps={{ 'aria-label': 'controlled' }}
+              //inputProps={{ 'aria-label': 'controlled' }}
             />
           </DialogContent>
           <DialogActions>
