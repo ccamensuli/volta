@@ -1,13 +1,14 @@
 {
   "extends": "@electron-toolkit/tsconfig/tsconfig.node.json",
   "include": [
-    "src/volta/library/**/*",
-    "src/volta/library/**/*.ts"
+    "src/volta/**/*",
+    "src/volta/**/*.ts"
   ],
   "compilerOptions": {
     "composite": true,
     "declaration": true,
-    "declarationDir": "src/volta/library/types",
+    "declarationDir": "src/volta/types",
+    "moduleResolution": "Node",
     "types": []
   }
 }
