@@ -1,4 +1,4 @@
-## 1.0.0 (2023-12-06)
+## 1.0.0 (2023-12-07)
 
 
 ### Features
@@ -8,6 +8,7 @@
 
 ### Bug Fixes
 
+* **application:** debug update clean repo ([6b729ab](https://github.com/ccamensuli/volta/commit/6b729abadd267c61e32cfab24d3adf4da3ff735f))
 * **electron:** flow dev backend ipc events ... ([618c348](https://github.com/ccamensuli/volta/commit/618c34896b4d928089851cc7f7afbafa543e6ab7))
 * **electron:** ipc add events ([76252a7](https://github.com/ccamensuli/volta/commit/76252a7a548740ec6720841107e12c2088bc61ed))
 * infra and skeleton ([00dd446](https://github.com/ccamensuli/volta/commit/00dd44600ce437cf0609621a88a5f7b159ed10b4))
