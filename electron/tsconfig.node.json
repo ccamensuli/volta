@@ -5,6 +5,7 @@
     "src/main/*",
     "src/main/**/*",
     "src/preload/*",
+    "src/volta/**/*",
     "src/volta/types/**/*",
     "src/types/**/*"
   ],
