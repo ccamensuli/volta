@@ -4,10 +4,10 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import os from 'node:os'
 import path from 'node:path'
-
+declare module 'asciify'
+import asciify from 'asciify'
 import voltadb from '../volta/database/sequelize'
 const dbPath = path.join(__dirname, '..', '..', '..', 'tmp', 'volta.db')
-
 import './ipc/horloge.ts'
 
 // on macOS
@@ -53,35 +53,40 @@ function createWindow(): BrowserWindow {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(async () => {
-  let mywindow: BrowserWindow
-  // Set app user model id for windows
-  electronApp.setAppUserModelId('com.electron')
+  asciify(app.getName(), { color: 'green', font: 'banner' }, async (err, result) => {
+    console.clear()
+    console.log(`${result}
+      Version : ${app.getVersion()}  OS : ${os.arch() } ${process.platform}
+    `)
+    let mywindow: BrowserWindow
+    // Set app user model id for windows
+    electronApp.setAppUserModelId('com.electron')
 
-  if (voltadb && !voltadb.isSYNC) {
-    await voltadb.initdb(dbPath)
-  }
-
-  // Default open or close DevTools by F12 in development
-  // and ignore CommandOrControl + R in production.
-  // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
-  app.on('browser-window-created', async (_, window) => {
-    optimizer.watchWindowShortcuts(window)
-    if (mywindow) {
-      //await mywindow.openDevTools()
+    if (voltadb && !voltadb.isSYNC) {
+      await voltadb.initdb(dbPath)
     }
-    if (reactDevToolsPath) {
-      //await session.defaultSession.loadExtension(reactDevToolsPath)
-    }
+
+    // Default open or close DevTools by F12 in development
+    // and ignore CommandOrControl + R in production.
+    // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
+    app.on('browser-window-created', async (_, window) => {
+      optimizer.watchWindowShortcuts(window)
+      if (mywindow) {
+        //await mywindow.openDevTools()
+      }
+      if (reactDevToolsPath) {
+        //await session.defaultSession.loadExtension(reactDevToolsPath)
+      }
+    })
+
+    mywindow = createWindow()
+
+    app.on('activate', function () {
+      // On macOS it's common to re-create a window in the app when the
+      // dock icon is clicked and there are no other windows open.
+      if (BrowserWindow.getAllWindows().length === 0) mywindow = createWindow()
+    })
   })
-
-  mywindow = createWindow()
-
-  app.on('activate', function () {
-    // On macOS it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
-    if (BrowserWindow.getAllWindows().length === 0) mywindow = createWindow()
-  })
-
 })
 
 // Quit when all windows are closed, except on macOS. There, it's common
