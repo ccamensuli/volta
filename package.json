@@ -11,7 +11,7 @@
   },
   "scripts": {
     "volta": "npx volta",
-    "build": "yarn --cwd ./electron install",
+    "build": "yarn install ; yarn --cwd ./electron install",
     "start": "npx volta",
     "dev": "yarn --cwd ./electron dev",
     "changelog": "conventional-changelog -p conventionalcommits -i CHANGELOG.md -s -r 0"
