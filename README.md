@@ -16,6 +16,9 @@ $ yarn install
 $ yarn build
 $ yarn dev 
 ```
+<p align="center">
+  <img src="./tools/exercice.png" title="exercice" alt="exercice screen">
+</p>
 
 # Environment de developpment:
 
