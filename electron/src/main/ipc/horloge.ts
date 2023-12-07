@@ -167,9 +167,8 @@ class Horloge implements voltaIPC {
       }
       const alarm = await voltadb.alarm.findOne(options)
       if (alarm) {
-        alarm.activate = datas.activate
-        return alarm
-          .save({ fields: ['activate'] })
+        voltadb.alarm
+          .update({ active: datas.active }, options)
           .then((res) => {
             return res
           })

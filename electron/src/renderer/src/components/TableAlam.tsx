@@ -1,6 +1,5 @@
-import React, { useRef } from 'react'
+import React, { useState } from 'react'
 import { useEffect } from 'react'
-import { Button } from '@mui/material'
 import Table from '@mui/material/Table'
 import TableBody from '@mui/material/TableBody'
 import TableCell from '@mui/material/TableCell'
@@ -20,11 +19,14 @@ export default function TableAlarm(props: {
 }): JSX.Element {
   const ipcChannel = 'ipc-volta-horloge'
   const { on, sendMessage, loading, datas } = useIpc(ipcChannel)
+  //const [checkedStates, setCheckedStates] = useState<boolean[]>([])
+  const [alarms, setAlarms] = useState<unknown[]>([])
 
   useEffect(() => {
     const unlisten = on((messageipc: IpcMessage) => {
       switch (messageipc.action) {
         case 'GET':
+          setAlarms(messageipc.datas.reverse())
           props.onAlarms(messageipc.datas)
           break
         case 'CREATE':
@@ -58,8 +60,16 @@ export default function TableAlarm(props: {
 
   // Mutations
   const handleChange = (id: number, active: boolean): void => {
-    activateAlarm(id, active)
+    const alarm = alarms.filter((ele: unknown, index: number) => {
+      if (id === ele.id) {
+        return ele
+      }
+    })
+    if (alarm.length) {
+      activateAlarm(alarm[0].id, alarm[0].active)
+    }
   }
+
   const handeldelete = (id: number): void => {
     deleteAlarm(id)
   }
@@ -74,12 +84,12 @@ export default function TableAlarm(props: {
     }
     sendMessage(message)
   }
-  const activateAlarm = (id: number, activate: boolean): void => {
+  const activateAlarm = (id: number, active: boolean): void => {
     const message: IpcMessage = {
       channel: 'ipc-volta-horloge',
       date: new Date().getTime(),
       action: 'UPDATE',
-      datas: { id, activate },
+      datas: { id, active },
       error: null
     }
     sendMessage(message)
@@ -109,10 +119,8 @@ export default function TableAlarm(props: {
               </TableRow>
             </TableHead>
             <TableBody>
-              {datas &&
-                datas.datas &&
-                datas.datas.map &&
-                datas.datas.reverse().map((row) => (
+              {alarms &&
+                alarms.map((row) => (
                   <TableRow key={row.id}>
                     <TableCell component="th" scope="row" style={{ fontSize: '50px' }}>
                       {moment(row.date).format('HH:mm')}
@@ -120,8 +128,11 @@ export default function TableAlarm(props: {
                     <TableCell align="right">{row.message}</TableCell>
                     <TableCell align="center">
                       <Switch
-                        checked={row.active}
-                        onChange={() => {
+                        //checked={row.active}
+                        defaultChecked={row.active}
+                        key={row.id}
+                        onChange={(event) => {
+                          row.active = !row.active
                           handleChange(row.id, row.active)
                         }}
                       />

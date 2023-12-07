@@ -46,10 +46,10 @@ const Clock: React.FC<ClockProps> = ({
     <Container maxWidth="lg">
       <h1 style={style}>{moment(currentTime).format('HH:mm:ss')}</h1>
       {chips &&
-        chips.map((alarm: any) => (
+        chips.map((alarm: any, index) => (
           <Chip
+            key={index}
             sx={{ margin: '5px' }}
-            key={alarm.id}
             label={`${moment(alarm.date).format('HH:mm')} ${alarm.message}`}
             color="primary"
             variant="outlined"

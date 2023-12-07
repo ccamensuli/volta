@@ -7,7 +7,7 @@ interface IpcOutput {
   once: (func: (data: IpcMessage) => void) => void
   loading: boolean
   error: Error | null
-  datas: any[]
+  datas: unknown[]
   id: IpcMessage['id']
 }
 
@@ -19,9 +19,9 @@ function useIpc(channel): IpcOutput {
 
   const on = (func: (data: IpcMessage) => void): void => {
     return window.volta.on(channel, (data: string) => {
-      console.info(`EVENT ON ${channel} : `)
       try {
         const res = JSON.parse(data)
+        console.info(`EVENT ON ${res.id} ${channel} : ${res.action}`)
         setDatas(res)
         return func(res)
       } catch (e) {
@@ -36,9 +36,9 @@ function useIpc(channel): IpcOutput {
 
   const once = (func: (data: IpcMessage) => void): void => {
     return window.volta.once(channel, (data: string) => {
-      console.info(`EVENT ONCE ${channel} : `)
       try {
         const res = JSON.parse(data)
+        console.info(`EVENT ONCE ${res.id} ${channel} : ${res.action}`)
         setDatas(res)
         return func(res)
       } catch (e) {
@@ -54,6 +54,7 @@ function useIpc(channel): IpcOutput {
     try {
       setLoading(true)
       message.id = uuid()
+      console.info(`SEND  ${message.id} ${message.channel} : ${message.action}`)
       window.volta.sendMessage(channel, JSON.stringify(message))
       setId(message.id)
       return message.id

@@ -7,10 +7,9 @@ Programmer une horloge avec gestion d'alarme.
 - Côté "main" (la partie backend-like d'Electron), assurez la persistance des alarmes (par exemple, en utilisant SQLite).
 - Mettez en place la mécanique de communication d'Electron pour permettre la communication entre les processus.
 
+# GETTING STARTED 
 
-# GET STARTED 
-
-## yarn est obligatoire 
+### yarn est obligatoire 
 ```bash
 $ npm -g install yarn
 $ yarn install
@@ -157,13 +156,26 @@ interface msgTemplate {
 }
 ```
 
+### DATABASE sqlite (/tmp/volta.db) 
+``` bash
+$ sqlite3 tmp/volta.db .dump
+```
+``` sql
+PRAGMA foreign_keys=OFF;
+BEGIN TRANSACTION;
+CREATE TABLE `alarms` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `date` DATETIME NOT NULL, `active` TINYINT(1) NOT NULL DEFAULT 1, `message` VARCHAR(1024), `createdAt` DATETIME NOT NULL, `updatedAt` DATETIME NOT NULL);
+DELETE FROM sqlite_sequence;
+COMMIT;
+```
+
 ### FRONTEND
-    -Pour les Notifications d'alarme j'utilise  [Notification API](https://developer.mozilla.org/en-US/docs/Web/API/Notifications_API/Using_the_Notifications_API) attention de pas les bloquer sur os
-   - Pour les dates [Moment.js](https://momentjs.com/)
-   - Pour découvrir les hooks react j'utiliserais [usehooks-ts](https://usehooks-ts.com/)
-   - Pour l'UI intégration de [MUI](https://mui.com/)
+  - Pour les Notifications d'alarme j'utilise  [Notification API](https://developer.mozilla.org/en-US/docs/Web/API/Notifications_API/Using_the_Notifications_API) (attention de pas les bloquer sur os !)
+  - Pour les dates [Moment.js](https://momentjs.com/)
+  - Pour découvrir les hooks react j'utiliserais [usehooks-ts](https://usehooks-ts.com/)
+  - Pour l'UI intégration de [MUI](https://mui.com/)
 
 # Améliorations possibles 
+  - Revue de code pour proteger tous les champs et securiser l'application 
   - Utilser un protocle serieux pour la communication interprocess (le typage seras plus facile)
   - Revoir les types de ORM sequelize et autres  (manque d'experience)
   - Refactoriser un hook react pour un retour async des messages IPC (avec un id)
@@ -174,9 +186,11 @@ interface msgTemplate {
   - mettre en place de la documentation pour la lib et du jsdoc 
   - Mettre un Place un systeme de log puissant qui peux s'interfacer avec les outils actuel
 
-# Production Electron (je ne realise pas cette partie)
+# Production Electron Packager
 
-```bash
+``` bash
+cd electron 
+
 # For windows
 $ yarn build:win
 

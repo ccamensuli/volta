@@ -16,11 +16,12 @@ function useAlarm(
   const [currentTime, setCurrentTime] = useState<Date>(new Date())
   const [activeAlarm, setActiveAlarm] = useState<unknown[]>([])
 
+  // console.log(activeAlarm)
+
   useInterval(() => {
     const current = new Date()
     setCurrentTime(current)
     if (onTick) {
-      //console.log(alarms)
       onTick(current, activeAlarm)
     }
   }, tick)
@@ -42,10 +43,13 @@ function useAlarm(
   const handleCheck = (): void => {
     if (alarms.length) {
       const now = moment(currentTime).format('HH:mm')
-      alarms.filter((ele) => {
+      //console.log(alarms)
+      alarms.map((ele) => {
         const alarm = moment(ele.date).format('HH:mm')
+        //console.log(alarm, activeAlarm)
         const newActive = activeAlarm.filter((oldactive: any) => {
           const test = moment(oldactive.date).format('HH:mm')
+          //console.log(test, now)
           if (test === now) {
             return oldactive
           }
@@ -54,6 +58,7 @@ function useAlarm(
           if (onRing) {
             try {
               notification(`Alarm ${alarm}`, ele.message)
+              //console.log('onRing', ele)
               newActive.push(ele)
               ele.isNotif = true
               onRing(ele)

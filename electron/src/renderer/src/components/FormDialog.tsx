@@ -14,11 +14,12 @@ import { StaticTimePicker } from '@mui/x-date-pickers/StaticTimePicker'
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
 import CircularProgress from '@mui/material/CircularProgress/CircularProgress'
 import Switch from '@mui/material/Switch/Switch'
+import FormControlLabel from '@mui/material/FormControlLabel'
 
 interface AlarmFormData {
   message: string
   date: Date
-  activate: boolean
+  active: boolean
 }
 
 interface CustomElements extends HTMLFormControlsCollection {
@@ -39,17 +40,13 @@ export default function FormDialog(props: {
   const { on, sendMessage, loading, id } = useIpc(ipcChannel)
   // form
   const [date, setDate] = useState<any>(moment())
-  const [activate, setChecked] = useState(true)
+  const [active, setChecked] = useState(true)
   const [idRequest, setIdRequest] = useState<IpcMessage['id']>(null)
 
   useEffect(() => {
     const unlisten = on((message: IpcMessage) => {
-      console.log('retour idRequest  =>', idRequest, id)
       if (props.onCreate) {
         props.onCreate(message.datas)
-      }
-      if (message.id === idRequest) {
-        console.log(`is my request`)
       }
       if (props.onClose) {
         props.onClose(false)
@@ -70,9 +67,7 @@ export default function FormDialog(props: {
       error: null
     }
     const myid = sendMessage(message)
-    //console.log('send create  myid : ', myid, 'id : ', id)
     setIdRequest(myid)
-    //console.log('send create  idRequest : ', idRequest, ' id : ', id)
   }
 
   const handleClose = (event: React.ChangeEvent<HTMLInputElement>): void => {
@@ -92,7 +87,7 @@ export default function FormDialog(props: {
       const data = {
         message: target.message.value,
         date: date.toDate(),
-        activate
+        active
       }
       // controle des champs !!!!
       return createAlarm(data)
@@ -136,11 +131,16 @@ export default function FormDialog(props: {
                 //fullWidth
               ></StaticTimePicker>
             </LocalizationProvider>
-            <Switch
-              name="activate"
-              checked={activate}
-              onChange={handleChange}
-              //inputProps={{ 'aria-label': 'controlled' }}
+            <FormControlLabel
+              control={
+                <Switch
+                  name="active"
+                  checked={active}
+                  onChange={handleChange}
+                  inputProps={{ 'aria-label': 'controlled' }}
+                />
+              }
+              label="Activer"
             />
           </DialogContent>
           <DialogActions>

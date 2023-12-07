@@ -28,7 +28,7 @@ function App(): JSX.Element {
     setAlarm(data)
   }
   const handleAlarm = (alarm: any): void => {
-    console.info(alarm)
+    //console.info(alarm)
     //alert(alarm.message)
   }
 
